@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <title>IRCasTRF</title>
+
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta property="og:image" content="">
+    <meta property="og:image:type" content="">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="">
+    <meta property="og:title"
+        content="IRCasTRF: Inverse Rendering by Optimizing Cascaded Tensorial Radiance Fields, Lighting, and Materials from Multi-view Images">
+    <meta property="og:description" content="">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title"
+        content="IRCasTRF: Inverse Rendering by Optimizing Cascaded Tensorial Radiance Fields, Lighting, and Materials from Multi-view Images">
+    <meta name="twitter:description" content="">
+    <meta name="twitter:image" content="">
+
+
+
+    <!-- mirror: F0%9F%AA%9E&lt -->
+    <link rel="icon"
+        href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text y=%22.9em%22 font-size=%2290%22&gt;%E2%9C%A8&lt;/text&gt;&lt;/svg&gt;">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/codemirror.min.css">
+    <link rel="stylesheet" href="css/app.css">
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/codemirror.min.js"></script>
+    <script src="js/clipboard.min.js"></script>
+    <script src="js/video_comparison.js"></script>
+    <script src="js/app.js"></script>
+</head>
+
+<body>
+    <div class="container" id="header" style="text-align: center; margin: auto;">
+        <div class="row" id="title-row" style="max-width: 100%; margin: 0 auto; display: inline-block">
+            <h2 class="col-md-12 text-center" id="title">
+                <b>IRCasTRF</b>: Inverse Rendering by Optimizing Cascaded Tensorial Radiance Fields, Lighting, and
+                Materials from Multi-view Images<br>
+                <small>
+
+                </small>
+            </h2>
+        </div>
+        <div class="row" id="author-row" style="margin:0 auto;">
+            <div class="col-md-12 text-center" style="display: table; margin:0 auto">
+                <table class="author-table" id="author-table">
+                    <tr>
+                        <td>
+                            <a style="text-decoration:none" href="">
+                                Anonymous submission
+                            </a>
+                            <br><br>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('author-row').style.maxWidth = document.getElementById("title-row").clientWidth + 'px';
+    </script>
+    <div class="container" id="main">
+        <div class="row">
+            <div class="col-sm-6 col-sm-offset-3 text-center">
+                <ul class="nav nav-pills nav-justified">
+                    <li>
+                        <a href="">
+                            <img src="./img/paper.png" height="60px">
+                            <h4><strong>Paper</strong></h4>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://youtu.be/">
+                            <img src="./img/youtube_icon.png" height="60px">
+                            <h4><strong>Video </strong></h4>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="" target="_blank">
+                            <image src="img/github.png" height="60px">
+                                <h4><strong>Supplementary</strong></h4>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>
+                    Abstract
+                </h3>
+                <p class="text-justify">
+                    Reconstructing geometry and surface intrinsic properties from multi-view image observations can
+                    enable many downstream applications,
+                    such as building Metaverse and Virtual Reality.
+                    Recent NeRF-based methods have achieved great success in novel view synthesis.
+                    However, surface intrinsic properties and environmental lighting in NeRF are baked together,
+                    which hinders it from many downstream applications. In this paper,
+                    we present an inverse rendering pipeline that jointly reconstructs scene geometry,
+                    environment lighting, and spatially-varying material from posed multi-view images.
+                    Specifically, the presented pipeline contains volume and physics-based rendering separately in the
+                    exploration and exploitation steps.
+                    In the exploration step, our method learns an initial volumetric field by leveraging the compactness
+                    of neural radiance fields
+                    and the flexibility of a differentiable volume rendering approach,
+                    in which we propose a novel cascaded tensorial radiance field method on top of Canonical Polyadic
+                    (CP) decomposition to achieve
+                    higher model compactness than conventional methods. In the exploitation step, we use a shading pass
+                    that contains a differentiable physics-based
+                    shading method to jointly optimize the geometry, spatially-varying materials, and environment
+                    lighting from image reconstruction loss.
+                    Experiments show that our IRCasTRF achieves better model compactness and inverse rendering quality
+                    compared to prior works.
+                    Our final output is well-suited for downstream applications such as scene editing and advanced
+                    simulations.
+                </p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>
+                    Overall Pipeline
+                </h3>
+                <image src="img/architecture.png" class="img-responsive" alt="overview" width="80%"
+                    style="margin:auto;">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>
+                    Pipeline of CasCPRF
+                </h3>
+                <image src="img/pipeline_cascprf_1.png" class="img-responsive" alt="CasCPRF" width="80%"
+                    style="margin:auto;">
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>
+                    Introduction Video
+                </h3>
+                <div class="text-center">
+                    <div style="position:relative">
+                        <iframe width="840" height="460" src="https://www.youtube-nocookie.com/"
+                            title="YouTube video player" frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>
+                    Results of CasCPRF on RefNeRF- and NeRF-synthetic Dataset.
+                </h3>
+                <table width="100%">
+                    <tr>
+                        <td align="left" valign="top" width="25%">
+                            <video id="v2" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/CasCPRF/chair.mp4" type="video/mp4" />
+                            </video>
+                        </td>
+                        <td align="left" valign="top" width="25%">
+                            <video id="v3" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/CasCPRF/drums.mp4" type="video/mp4" />
+                            </video>
+                        </td>
+                        <td align="left" valign="top" width="25%">
+                            <video id="v2" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/CasCPRF/ficus.mp4" type="video/mp4" />
+                            </video>
+                        </td>
+                        <td align="left" valign="top" width="25%">
+                            <video id="v3" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/CasCPRF/hotdog.mp4" type="video/mp4" />
+                            </video>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left" valign="top" width="25%">
+                            <video id="v2" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/CasCPRF/lego.mp4" type="video/mp4" />
+                            </video>
+                        </td>
+                        <td align="left" valign="top" width="25%">
+                            <video id="v3" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/CasCPRF/materials.mp4" type="video/mp4" />
+                            </video>
+                        </td>
+
+                        <td align="left" valign="top" width="25%">
+                            <video id="v2" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/CasCPRF/mic.mp4" type="video/mp4" />
+                            </video>
+                        </td>
+                        <td align="left" valign="top" width="25%">
+                            <video id="v3" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/CasCPRF/ship.mp4" type="video/mp4" />
+                            </video>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left" valign="top" width="25%">
+                            <video id="v2" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/CasCPRF/ball.mp4" type="video/mp4" />
+                            </video>
+                        </td>
+                        <td align="left" valign="top" width="25%">
+                            <video id="v3" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/CasCPRF/car.mp4" type="video/mp4" />
+                            </video>
+                        </td>
+                        <td align="left" valign="top" width="25%">
+                            <video id="v2" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/CasCPRF/coffee.mp4" type="video/mp4" />
+                            </video>
+                        </td>
+                        <td align="left" valign="top" width="25%">
+                            <video id="v3" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/CasCPRF/helmet.mp4" type="video/mp4" />
+                            </video>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left" valign="top" width="25%">
+                            <video id="v2" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/CasCPRF/teapot.mp4" type="video/mp4" />
+                            </video>
+                        </td>
+                        <td align="left" valign="top" width="25%">
+                            <video id="v3" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/CasCPRF/toaster.mp4" type="video/mp4" />
+                            </video>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>
+                    Inverse Rendering Results of Exploitation stage on NeRF- and RefNeRF-synthetic Dataset
+                </h3>
+                <table width="100%">
+                    <tbody>
+                        <tr>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v2" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/chair_kd.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v3" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/chair_ks.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v2" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/chair_normal.mp4"
+                                        type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <image src="video/experiment_video/exploitation/lgt_all/chair_light_image.png"
+                                    class="img-responsive" alt="chair_lgt" width="100%" style="margin:auto;">
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v3" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/chair_opt.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v2" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/drums_kd.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v3" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/drums_ks.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v2" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/drums_normal.mp4"
+                                        type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <image src="video/experiment_video/exploitation/lgt_all/drums_light_image.png"
+                                    class="img-responsive" alt="chair_lgt" width="100%" style="margin:auto;">
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v3" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/drums_opt.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v2" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/ficus_kd.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v3" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/ficus_ks.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v2" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/ficus_normal.mp4"
+                                        type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <image src="video/experiment_video/exploitation/lgt_all/ficus_light_image.png"
+                                    class="img-responsive" alt="chair_lgt" width="100%" style="margin:auto;">
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v3" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/ficus_opt.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v2" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/hotdog_kd.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v3" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/hotdog_ks.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v2" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/hotdog_normal.mp4"
+                                        type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <image src="video/experiment_video/exploitation/lgt_all/hotdog_light_image.png"
+                                    class="img-responsive" alt="chair_lgt" width="100%" style="margin:auto;">
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v3" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/hotdog_opt.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v2" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/lego_kd.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v3" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/lego_ks.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v2" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/lego_normal.mp4"
+                                        type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <image src="video/experiment_video/exploitation/lgt_all/lego_light_image.png"
+                                    class="img-responsive" alt="chair_lgt" width="100%" style="margin:auto;">
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v3" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/lego_opt.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v2" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/materials_kd.mp4"
+                                        type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v3" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/materials_ks.mp4"
+                                        type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v2" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/materials_normal.mp4"
+                                        type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <image src="video/experiment_video/exploitation/lgt_all/materials_light_image.png"
+                                    class="img-responsive" alt="chair_lgt" width="100%" style="margin:auto;">
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v3" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/materials_opt.mp4"
+                                        type="video/mp4" />
+                                </video>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v2" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/mic_kd.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v3" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/mic_ks.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v2" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/mic_normal.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <image src="video/experiment_video/exploitation/lgt_all/mic_light_image.png"
+                                    class="img-responsive" alt="chair_lgt" width="100%" style="margin:auto;">
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v3" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/mic_opt.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v2" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/ship_kd.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v3" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/ship_ks.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v2" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/ship_normal.mp4"
+                                        type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <image src="video/experiment_video/exploitation/lgt_all/ship_light_image.png"
+                                    class="img-responsive" alt="chair_lgt" width="100%" style="margin:auto;">
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v3" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/ship_opt.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v2" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/car_kd.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v3" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/car_ks.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v2" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/car_normal.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <image src="video/experiment_video/exploitation/lgt_all/car_light_image.png"
+                                    class="img-responsive" alt="chair_lgt" width="100%" style="margin:auto;">
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v3" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/car_opt.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v2" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/coffee_kd.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v3" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/coffee_ks.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v2" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/coffee_normal.mp4"
+                                        type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <image src="video/experiment_video/exploitation/lgt_all/coffee_light_image.png"
+                                    class="img-responsive" alt="chair_lgt" width="100%" style="margin:auto;">
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v3" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/coffee_opt.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v2" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/helmet_kd.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v3" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/helmet_ks.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v2" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/helmet_normal.mp4"
+                                        type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <image src="video/experiment_video/exploitation/lgt_all/helmet_light_image.png"
+                                    class="img-responsive" alt="chair_lgt" width="100%" style="margin:auto;">
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v3" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/helmet_opt.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v2" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/teapot_kd.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v3" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/teapot_ks.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v2" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/teapot_normal.mp4"
+                                        type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <image src="video/experiment_video/exploitation/lgt_all/teapot_light_image.png"
+                                    class="img-responsive" alt="chair_lgt" width="100%" style="margin:auto;">
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v3" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/teapot_opt.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v2" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/toaster_kd.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v3" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/toaster_ks.mp4" type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v2" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/toaster_normal.mp4"
+                                        type="video/mp4" />
+                                </video>
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <image src="video/experiment_video/exploitation/lgt_all/toaster_light_image.png"
+                                    class="img-responsive" alt="chair_lgt" width="100%" style="margin:auto;">
+                            </td>
+                            <td align="left" valign="top" width="25%">
+                                <video id="v3" width="100%" playsinline loop muted controls>
+                                    <source src="video/experiment_video/exploitation/toaster_opt.mp4"
+                                        type="video/mp4" />
+                                </video>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>
+                    Results of CasCPRF on 3 cascaded levels. Coarse to fine from left to right.
+                </h3>
+                <table width="100%">
+                    <tr>
+                        <td align="left" valign="top" width="25%">
+                            <video id="v2" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/CasCPRF/Cascaded/drums_video_3.mp4"
+                                    type="video/mp4" />
+                            </video>
+                        </td>
+                        <td align="left" valign="top" width="25%">
+                            <video id="v3" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/CasCPRF/Cascaded/drums_video_2.mp4"
+                                    type="video/mp4" />
+                            </video>
+                        </td>
+                        <td align="left" valign="top" width="25%">
+                            <video id="v2" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/CasCPRF/Cascaded/drums_video_1.mp4"
+                                    type="video/mp4" />
+                            </video>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left" valign="top" width="25%">
+                            <video id="v2" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/CasCPRF/Cascaded/ship_video_3.mp4"
+                                    type="video/mp4" />
+                            </video>
+                        </td>
+                        <td align="left" valign="top" width="25%">
+                            <video id="v3" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/CasCPRF/Cascaded/ship_video_2.mp4"
+                                    type="video/mp4" />
+                            </video>
+                        </td>
+                        <td align="left" valign="top" width="25%">
+                            <video id="v2" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/CasCPRF/Cascaded/ship_video_1.mp4"
+                                    type="video/mp4" />
+                            </video>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left" valign="top" width="25%">
+                            <video id="v2" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/CasCPRF/Cascaded/toaster_video_3.mp4"
+                                    type="video/mp4" />
+                            </video>
+                        </td>
+                        <td align="left" valign="top" width="25%">
+                            <video id="v3" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/CasCPRF/Cascaded/toaster_video_2.mp4"
+                                    type="video/mp4" />
+                            </video>
+                        </td>
+                        <td align="left" valign="top" width="25%">
+                            <video id="v2" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/CasCPRF/Cascaded/toaster_video_1.mp4"
+                                    type="video/mp4" />
+                            </video>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left" valign="top" width="25%">
+                            <video id="v2" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/CasCPRF/Cascaded/lego_video_3.mp4"
+                                    type="video/mp4" />
+                            </video>
+                        </td>
+                        <td align="left" valign="top" width="25%">
+                            <video id="v3" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/CasCPRF/Cascaded/lego_video_2.mp4"
+                                    type="video/mp4" />
+                            </video>
+                        </td>
+                        <td align="left" valign="top" width="25%">
+                            <video id="v2" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/CasCPRF/Cascaded/lego_video_1.mp4"
+                                    type="video/mp4" />
+                            </video>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>
+                    Training convergence visualization of the first 200 iterations in exploitation stage
+                </h3>
+                <table width="100%">
+                    <tr>
+                        <td align="left" valign="top" width="100%">
+                            <video id="v3" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/convergence_speed/car_training_convergence.mp4"
+                                    type="video/mp4" />
+                            </video>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left" valign="top" width="100%">
+                            <video id="v3" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/convergence_speed/chair_training_convergence.mp4"
+                                    type="video/mp4" />
+                            </video>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left" valign="top" width="100%">
+                            <video id="v3" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/convergence_speed/coffee_training_convergence.mp4"
+                                    type="video/mp4" />
+                            </video>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left" valign="top" width="100%">
+                            <video id="v3" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/convergence_speed/drums_training_convergence.mp4"
+                                    type="video/mp4" />
+                            </video>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left" valign="top" width="100%">
+                            <video id="v3" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/convergence_speed/ficus_training_convergence.mp4"
+                                    type="video/mp4" />
+                            </video>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left" valign="top" width="100%">
+                            <video id="v3" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/convergence_speed/helmet_training_convergence.mp4"
+                                    type="video/mp4" />
+                            </video>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left" valign="top" width="100%">
+                            <video id="v3" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/convergence_speed/hotdog_training_convergence.mp4"
+                                    type="video/mp4" />
+                            </video>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left" valign="top" width="100%">
+                            <video id="v3" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/convergence_speed/lego_training_convergence.mp4"
+                                    type="video/mp4" />
+                            </video>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left" valign="top" width="100%">
+                            <video id="v3" width="100%" playsinline loop muted controls>
+                                <source
+                                    src="video/experiment_video/convergence_speed/materials_training_convergence.mp4"
+                                    type="video/mp4" />
+                            </video>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left" valign="top" width="100%">
+                            <video id="v3" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/convergence_speed/mic_training_convergence.mp4"
+                                    type="video/mp4" />
+                            </video>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left" valign="top" width="100%">
+                            <video id="v3" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/convergence_speed/ship_training_convergence.mp4"
+                                    type="video/mp4" />
+                            </video>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left" valign="top" width="100%">
+                            <video id="v3" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/convergence_speed/teapot_training_convergence.mp4"
+                                    type="video/mp4" />
+                            </video>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left" valign="top" width="100%">
+                            <video id="v3" width="100%" playsinline loop muted controls>
+                                <source src="video/experiment_video/convergence_speed/toaster_training_convergence.mp4"
+                                    type="video/mp4" />
+                            </video>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>
+                    Acknowledgements
+                </h3>
+                <p class="text-justify">
+                    The website template was borrowed from <a href="https://dorverbin.github.io/refnerf/">Dor
+                        verbin</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+
+</html>
