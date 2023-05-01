@@ -113,29 +113,21 @@
                     Abstract
                 </h3>
                 <p class="text-justify">
-                    Reconstructing geometry and surface intrinsic properties from multi-view image observations can
-                    enable many downstream applications,
-                    such as building Metaverse and Virtual Reality.
-                    Recent NeRF-based methods have achieved great success in novel view synthesis.
-                    However, surface intrinsic properties and environmental lighting in NeRF are baked together,
-                    which hinders it from many downstream applications. In this paper,
-                    we present an inverse rendering pipeline that jointly reconstructs scene geometry,
-                    environment lighting, and spatially-varying material from posed multi-view images.
-                    Specifically, the presented pipeline contains volume and physics-based rendering separately in the
-                    exploration and exploitation steps.
-                    In the exploration step, our method learns an initial volumetric field by leveraging the compactness
-                    of neural radiance fields
-                    and the flexibility of a differentiable volume rendering approach,
-                    in which we propose a novel cascaded tensorial radiance field method on top of Canonical Polyadic
-                    (CP) decomposition to achieve
-                    higher model compactness than conventional methods. In the exploitation step, we use a shading pass
-                    that contains a differentiable physics-based
-                    shading method to jointly optimize the geometry, spatially-varying materials, and environment
-                    lighting from image reconstruction loss.
-                    Experiments show that our IRCasTRF achieves better model compactness and inverse rendering quality
-                    compared to prior works.
-                    Our final output is well-suited for downstream applications such as scene editing and advanced
-                    simulations.
+Although recent NeRF-based techniques have achieved remarkable
+success in novel view synthesis, they suffer from a limitation where
+surface intrinsic properties and environmental lighting are fused
+together. This limitation restricts the applicability of NeRF in numerous downstream applications. This paper proposes an inverse
+rendering pipeline that simultaneously reconstructs scene geometry, lighting, and spatially-varying material from a set of multi-view
+images. Specifically, the proposed pipeline involves volume and
+physics-based rendering, which are performed separately in two
+steps: exploration and exploitation. During the exploration step,
+our method utilizes the compactness of neural radiance fields and
+a flexible differentiable volume rendering technique to learn an initial volumetric field. Here, we introduce a novel cascaded tensorial
+radiance field method on top of the Canonical Polyadic (CP) decomposition to boost model compactness beyond conventional methods.
+In the exploitation step, a shading pass that incorporates a differentiable physics-based shading method is applied to jointly optimize
+the scene’s geometry, spatially-varying materials, and lighting, using image reconstruction loss. Experimental results demonstrate
+that our proposed inverse rendering pipeline, IRCasTRF, outperforms prior works in inverse rendering quality. The final output is
+highly compatible with downstream applications like scene editing and advanced simulations.
                 </p>
             </div>
         </div>
